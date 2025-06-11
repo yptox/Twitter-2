@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter 2</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="shortcut icon" href="favicon/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <script>
+        // Anti-Flicker Script: Apply dark mode immediately if set in localStorage
+        (function() {
+            try {
+                if (localStorage.getItem('theme') === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                }
+            } catch (e) { console.error("Could not apply initial theme.", e); }
+        })();
+    </script>
+</head><body>
+    <div class="game-container" id="gameContainer">
+        <header class="game-header">
+            <div class="header-main-content">
+                <div class="site-branding">
+                    <img src="images/Twitter.png" alt="Twitter Logo" class="site-logo">
+                </div>
+                <div class="profile-header">
+                    <img src="images/NathanImage7.png" alt="Nathan Henry" id="profilePicMain">
+                    <div class="profile-info">
+                        <div class="profile-name-container">
+                            <h1>Nathan Henry</h1>
+                            <button id="blockNathanButton" style="display: none;">Block (10,000 EP)</button>
+                        </div>
+                        <p class="handle">@Nathan9154438</p>
+                        <p class="bio" id="nathanBio">love to post</p>
+                    </div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <button id="darkModeToggle" title="Toggle Dark Mode">
+                    <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dark-mode-icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dark-mode-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
+            <div class="global-stats">
+                <p>Engagement Points: <span id="engagementPointsDisplay">0</span></p>
+                <p>Nathan's Tweets: <span id="totalTweetsDisplay">0</span></p>
+                <p id="likeBotStatusDisplay" style="display: none;">LikeBot: Inactive</p>
+                <p id="repostBotStatusDisplay" style="display: none;">RepostBot: Inactive</p>
+                <p id="bookmarkBotStatusDisplay" style="display: none;">BookmarkBot: Inactive</p>
+                <p id="sponsorBotStatusDisplay" style="display: none;">SponsorBot: Inactive</p>
+            </div>
+        </header>
+
+        <main class="main-layout">
+            <div class="main-content-header">
+                <button id="main-view-tab-timeline" class="main-view-tab active">Timeline</button>
+                <button id="main-view-tab-upgrades" class="main-view-tab">Upgrades</button>
+            </div>
+
+            <section id="tweetFeedContainer" class="feed-column">
+                <h3 class="desktop-only-header">Timeline</h3>
+                <div id="tweetFeed">
+                    <p class="no-tweets-message">Nathan is preparing his first tweet...</p>
+                </div>
+            </section>
+
+            <aside class="sidebar-column">
+                <section id="upgradesArea">
+                    <h4>Upgrades</h4>
+                    <ul id="upgradesList">
+                        <!-- Interaction Unlocks -->
+                        <li id="upgrade-repost" style="display: none;"><button id="upgrade-repost-button"></button></li>
+                        <li id="upgrade-bookmark" style="display: none;"><button id="upgrade-bookmark-button"></button></li>
+                        <li id="upgrade-sponsor" style="display: none;"><button id="upgrade-sponsor-button"></button></li>
+
+                        <!-- Bot Unlocks -->
+                        <li id="upgrade-likebot-unlock" style="display: none;"><button id="upgrade-likebot-unlock-button"></button></li>
+                        <li id="upgrade-repostbot-unlock" style="display: none;"><button id="upgrade-repostbot-unlock-button"></button></li>
+                        <li id="upgrade-bookmarkbot-unlock" style="display: none;"><button id="upgrade-bookmarkbot-unlock-button"></button></li>
+                        <li id="upgrade-sponsorbot-unlock" style="display: none;"><button id="upgrade-sponsorbot-unlock-button"></button></li>
+                        
+                        <!-- Bot Toggles (with progress bars) -->
+                        <li id="upgrade-likebot-toggle" style="display: none;">
+                            <button id="upgrade-likebot-toggle-button"></button>
+                            <div class="bot-progress-container"><div id="likeBotProgressBar" class="bot-progress-bar"></div></div>
+                        </li>
+                        <li id="upgrade-repostbot-toggle" style="display: none;">
+                            <button id="upgrade-repostbot-toggle-button"></button>
+                            <div class="bot-progress-container"><div id="repostBotProgressBar" class="bot-progress-bar"></div></div>
+                        </li>
+                        <li id="upgrade-bookmarkbot-toggle" style="display: none;">
+                            <button id="upgrade-bookmarkbot-toggle-button"></button>
+                            <div class="bot-progress-container"><div id="bookmarkBotProgressBar" class="bot-progress-bar"></div></div>
+                        </li>
+                        <li id="upgrade-sponsorbot-toggle" style="display: none;">
+                            <button id="upgrade-sponsorbot-toggle-button"></button>
+                            <div class="bot-progress-container"><div id="sponsorBotProgressBar" class="bot-progress-bar"></div></div>
+                        </li>
+                    </ul>
+                </section>
+                <section id="activityNotificationsArea">
+                    <h4>Notifications</h4>
+                    <ul id="notificationsList">
+                        <!-- Notifications will appear here -->
+                    </ul>
+                </section>
+            </aside>
+        </main>
+
+        <footer class="game-footer">
+            <p>© Elon Musk</p>
+        </footer>
+    </div>
+    
+    <div id="endScreen" style="display: none;">
+        <h1>Nathan is alone.</h1>
+        <p class="final-stat">You blocked him in: <span id="finalTimeDisplay">00:00:00</span></p>
+        <button id="resetGameButton">Play Again?</button>
+    </div>
+
+    <script src="script.js"></script>
+
+    <div id="welcomeModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2>Welcome to Twitter 2!</h2>
+            <p>It's just Nathan here. Every interaction with him will reward you with Engagement Points (EP).</p>
+            <p>Use EP to automate interactions and unlock new ways to engage.</p>
+            <p class="unlock-notification">Your 'Like' is his inspiration. Liking a tweet makes Nathan post a new one.</p>
+            <button id="welcomeModalCloseButton">Got It!</button>
+        </div>
+    </div>
+
+</body>
+</html>

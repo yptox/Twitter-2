@@ -1,0 +1,421 @@
+/* Global Resets and Base Styles */
+:root {
+    /* Light Mode (Default) */
+    --primary-bg: #F5F8FA;
+    --secondary-bg: #FFFFFF;
+    --primary-text: #14171A;
+    --secondary-text: #657786;
+    --border-color: #E1E8ED;
+    --hover-bg-tweet: #F5F8FA;
+    --disabled-bg: #AAB8C2;
+    --disabled-text: #657786;
+
+    /* Notifications */
+    --notification-unlock-bg: rgba(23,191,99,0.1);
+    --notification-unlock-text: #177f43;
+    --notification-system-bg: rgba(29,161,242,0.08);
+    --notification-system-text: #0f628a;
+    --notification-error-bg: rgba(224,36,94,0.1);
+    --notification-error-text: #c41e3a;
+
+    /* Popups */
+    --popup-text: #000;
+    --popup-shadow: white;
+
+    /* Brand color - consistent across themes */
+    --twitter-blue: #1DA1F2;
+    --twitter-white: #FFFFFF;
+
+    /* Universal values */
+    --border-radius-default: 8px;
+    --border-radius-tweets: 6px; 
+    --font-family-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+html.dark-mode {
+    /* Dark Mode Overrides */
+    --primary-bg: #000000;
+    --secondary-bg: #000000;
+    --primary-text: #E7E9EA;
+    --secondary-text: #71767B;
+    --border-color: #2F3336;
+    --hover-bg-tweet: #080808;
+    --disabled-bg: #536471;
+    --disabled-text: #8d9aa5;
+    --notification-unlock-bg: rgba(0, 186, 124, 0.15);
+    --notification-unlock-text: #00ba7c;
+    --notification-system-bg: rgba(29, 161, 242, 0.15);
+    --notification-system-text: var(--twitter-blue);
+    --notification-error-bg: rgba(249, 24, 128, 0.15);
+    --notification-error-text: #f91880;
+    --popup-text: #FFF;
+    --popup-shadow: black;
+}
+
+html, body { height: 100%; margin: 0; padding: 0; overflow-x: hidden; }
+
+body {
+    font-family: var(--font-family-system);
+    background-color: var(--primary-bg);
+    color: var(--primary-text);
+    display: flex; justify-content: center; align-items: flex-start;
+    padding: 20px; box-sizing: border-box; line-height: 1.4;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.game-container {
+    width: 95%; max-width: 1000px;
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-default);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    padding: 0; overflow: hidden;
+    display: flex; flex-direction: column;
+    height: calc(100vh - 40px); max-height: calc(100vh - 40px);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.game-header { 
+    padding: 15px 20px; 
+    border-bottom: 1px solid var(--border-color); 
+    flex-shrink: 0; 
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.3s;
+}
+.header-main-content { flex-grow: 1; }
+.header-controls { display: flex; align-items: center; gap: 10px; }
+#darkModeToggle {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--secondary-text);
+    padding: 6px;
+    border-radius: 50%;
+    cursor: pointer;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+#darkModeToggle:hover {
+    background-color: var(--hover-bg-tweet);
+}
+.dark-mode-icon {
+    stroke: var(--secondary-text);
+}
+
+.site-branding { display: flex; align-items: center; margin-bottom: 15px; }
+.site-logo {  height: 55px; }
+.profile-header { display: flex; align-items: center; margin-bottom: 15px; }
+#profilePicMain { width: 72px; height: 72px; border-radius: 50%; margin-right: 15px; border: 2px solid var(--twitter-blue); object-fit: cover; }
+.profile-info h1 { margin: 0 0 2px 0; font-size: 1.5em; font-weight: 700; color: var(--primary-text); }
+.profile-info .handle { margin: 0 0 4px 0; color: var(--secondary-text); font-size: 0.95em; }
+.profile-info .bio { margin: 0; color: var(--primary-text); font-size: 0.9em; }
+
+.profile-name-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.global-stats { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 0.85em; padding-top: 15px; border-top: 1px solid var(--border-color); margin-top: 15px; width: 100%; transition: border-color 0.3s;}
+.global-stats p { margin: 0; color: var(--secondary-text); }
+.global-stats span { font-weight: 600; color: var(--primary-text); }
+
+.main-layout { display: flex; flex-grow: 1; min-height: 0; }
+.feed-column { flex: 3; min-width: 0; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; transition: border-color 0.3s;}
+.sidebar-column { flex: 1.2; min-width: 280px; background-color: var(--secondary-bg); padding: 0; display: flex; flex-direction: column; transition: background-color 0.3s; position: relative; }
+
+.desktop-only-header {
+    margin: 0; padding: 12px 15px; font-size: 1.1em; font-weight: 700;
+    color: var(--primary-text); border-bottom: 1px solid var(--border-color);
+    background-color: var(--secondary-bg); flex-shrink: 0;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+.main-content-header {
+    display: none;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+.main-view-tab {
+    flex-basis: 50%;
+    flex-grow: 1;
+    padding: 14px;
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--secondary-text);
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.main-view-tab:hover {
+    background-color: var(--hover-bg-tweet);
+}
+.main-view-tab.active {
+    color: var(--twitter-blue);
+    border-bottom-color: var(--twitter-blue);
+}
+
+#tweetFeedContainer { display: flex; flex-direction: column; flex-grow: 1; min-height: 0; }
+#tweetFeed { flex-grow: 1; overflow-y: auto; padding: 0; }
+.no-tweets-message { color: var(--secondary-text); text-align: center; padding: 30px; font-style: italic; }
+.tweet { background-color: var(--secondary-bg); border-bottom: 1px solid var(--border-color); padding: 12px 15px; display: flex; gap: 12px; transition: background-color 0.2s, border-color 0.3s; }
+.tweet:hover { background-color: var(--hover-bg-tweet); }
+.tweet-avatar-container { flex-shrink: 0; }
+.tweet-author-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+.tweet-main-content { flex-grow: 1; min-width: 0; }
+.tweet-header { display: flex; align-items: center; margin-bottom: 4px; font-size: 0.95em; }
+.tweet-author-details .tweet-author-name { font-weight: 700; color: var(--primary-text); }
+.tweet-author-details .tweet-author-handle, .tweet-timestamp { color: var(--secondary-text); margin-left: 5px; }
+.tweet-timestamp { margin-left: auto; }
+.tweet-content { margin-bottom: 10px; font-size: 0.95em; line-height: 1.5; word-wrap: break-word; color: var(--primary-text); }
+.tweet-image-container { margin: 10px 0; text-align: left; }
+.tweet-image { max-width: 100%; max-height: 350px; border-radius: var(--border-radius-tweets); border: 1px solid var(--border-color); object-fit: cover; }
+
+.interaction-buttons-container { margin-top: 10px; display: flex; gap: 8px; }
+.interaction-buttons-container button {
+    background-color: transparent; color: var(--secondary-text);
+    border: 1px solid var(--border-color); padding: 6px 10px;
+    border-radius: 16px; cursor: pointer; font-size: 0.75em; font-weight: 600;
+    transition: all 0.2s ease; flex-grow: 1; text-align: center;
+}
+.interaction-buttons-container button:hover:not(:disabled) {
+    color: var(--twitter-blue); border-color: var(--twitter-blue); background-color: rgba(29,161,242,0.1);
+}
+
+.interaction-buttons-container button.interaction-complete {
+    border-color: transparent !important;
+    background-color: transparent !important;
+    cursor: default;
+    color: var(--secondary-text);
+    opacity: 0.8;
+}
+.interaction-buttons-container button.interaction-complete:hover {
+    background-color: transparent !important;
+    color: var(--secondary-text) !important;
+}
+
+#upgradesArea, #activityNotificationsArea { 
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+#upgradesArea { 
+    border-bottom: 1px solid var(--border-color); 
+    flex: 1;
+}
+#activityNotificationsArea {
+    flex: 1;
+}
+
+#upgradesArea h4, #activityNotificationsArea h4 {
+    margin: 0; padding: 12px 15px; font-size: 1.1em; font-weight: 700;
+    color: var(--primary-text); border-bottom: 1px solid var(--border-color);
+    background-color: var(--secondary-bg); flex-shrink: 0;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+#upgradesList, #notificationsList { 
+    list-style-type: none; 
+    padding: 0; 
+    margin: 0;
+    overflow-y: auto;
+}
+#upgradesList li, #notificationsList li { padding: 10px 15px; margin-bottom: 0; font-size: 0.85em; border-bottom: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s; }
+#upgradesList li:last-child, #notificationsList li:last-child { border-bottom: none; }
+#upgradesList button {
+    width: 100%; padding: 8px 10px; font-size: 0.9em;
+    background-color: var(--twitter-blue); color: var(--twitter-white);
+    border: none; border-radius: var(--border-radius-tweets); cursor: pointer;
+    text-align: left; transition: background-color 0.2s ease; margin-top: 4px;
+}
+#upgradesList button:hover:not(:disabled) { background-color: #1a91da; }
+#upgradesList button:disabled { background-color: var(--disabled-bg); color: var(--disabled-text); cursor: not-allowed; }
+
+#notificationsList li.notification-unlock { background-color: var(--notification-unlock-bg); color: var(--notification-unlock-text); font-weight: bold; }
+#notificationsList li.notification-system { background-color: var(--notification-system-bg); color: var(--notification-system-text); }
+#notificationsList li.notification-error { background-color: var(--notification-error-bg); color: var(--notification-error-text); }
+
+.game-footer { padding: 15px 20px; text-align: center; border-top: 1px solid var(--border-color); font-size: 0.8em; color: var(--secondary-text); background-color: var(--primary-bg); flex-shrink: 0; transition: all 0.3s; }
+.game-footer p { margin: 3px 0; }
+
+.bot-progress-container { height: 6px; background-color: var(--border-color); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.bot-progress-bar { height: 100%; width: 0%; background-color: var(--twitter-blue); border-radius: 3px; transition: width 0.05s linear; }
+
+@keyframes fade-up { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
+.click-popup { position: absolute; z-index: 1000; pointer-events: none; font-weight: bold; font-size: 1.1em; color: var(--popup-text); text-shadow: 0 0 5px var(--popup-shadow); padding: 2px 5px; animation: fade-up 1.2s forwards ease-out; }
+
+/* --- BLOCK BUTTON AND END SCREEN --- */
+#blockNathanButton {
+    background-color: #E0245E;
+    color: var(--twitter-white);
+    border: none;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+#blockNathanButton:hover:not(:disabled) {
+    background-color: #c41e3a;
+}
+
+#blockNathanButton:disabled {
+    background-color: #E0245E;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#endScreen {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: var(--primary-bg); color: var(--primary-text); z-index: 2000;
+    flex-direction: column; justify-content: center; align-items: center; text-align: center;
+}
+#endScreen h1 { font-size: 3em; font-weight: 700; margin-bottom: 20px; }
+#endScreen .final-stat { font-size: 1.2em; color: var(--secondary-text); margin-bottom: 30px; }
+#endScreen .final-stat span { font-weight: bold; color: var(--primary-text); }
+#endScreen button {
+    padding: 12px 24px; font-size: 1em; font-weight: bold;
+    background-color: var(--twitter-blue); color: var(--twitter-white);
+    border: none; border-radius: var(--border-radius-default); cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+#endScreen button:hover { background-color: #1a91da; }
+
+/* --- Modal Styles --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+}
+
+.modal-content {
+    background-color: var(--secondary-bg);
+    padding: 25px;
+    border-radius: var(--border-radius-default);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+}
+.modal-content h2 {
+    margin-top: 0;
+    color: var(--primary-text);
+}
+.modal-content p {
+    color: var(--secondary-text);
+    line-height: 1.6;
+}
+.modal-content .unlock-notification {
+    background-color: var(--notification-unlock-bg);
+    color: var(--notification-unlock-text);
+    padding: 10px;
+    border-radius: var(--border-radius-tweets);
+    font-weight: 500;
+}
+.modal-content button {
+    background-color: var(--twitter-blue);
+    color: var(--twitter-white);
+    border: none;
+    padding: 12px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: var(--border-radius-default);
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.2s ease;
+}
+.modal-content button:hover {
+    background-color: #1a91da;
+}
+
+
+/* =================================== */
+/* === MOBILE RESPONSIVENESS RULES === */
+/* =================================== */
+
+@media (max-width: 800px) {
+    /* General Mobile Setup */
+    body { padding: 0; }
+    .game-container {
+        width: 100%;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+        border: none;
+    }
+    .game-footer { display: none; }
+
+    /* Show mobile-specific elements */
+    .main-content-header {
+        display: flex;
+    }
+    .desktop-only-header {
+        display: none;
+    }
+    
+    /* --- View Swapping Logic --- */
+    .main-layout {
+        flex-direction: column;
+    }
+    .sidebar-column {
+        display: none;
+    }
+    .main-layout.upgrades-view-active .sidebar-column {
+        display: flex;
+        flex-grow: 1;
+        border-right: none;
+    }
+    .main-layout.upgrades-view-active .feed-column {
+        display: none;
+    }
+    .feed-column {
+        border-right: none;
+        flex-grow: 1;
+    }
+    
+    /* --- Cosmetic Adjustments --- */
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #profilePicMain {
+        margin-bottom: 15px;
+    }
+}
+
+/* Landscape Mobile View */
+@media (max-height: 500px) and (min-width: 801px) {
+    .main-content-header {
+        display: none;
+    }
+    .desktop-only-header {
+        display: block;
+    }
+    
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    #profilePicMain {
+        margin-bottom: 10px;
+    }
+}
