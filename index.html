@@ -1,17 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- [Beginner] - BASIC METADATA
+    This section contains basic information about the webpage.
+    `charset="UTF-8"` ensures characters display correctly.
+    `viewport` makes the site responsive and look good on mobile devices.
+    The `title` is what appears in the browser tab. -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Twitter 2</title>
+
+    <!-- [Beginner] - FAVICONS
+    These links provide the small icon (favicon) that appears in the browser tab and on mobile home screens.
+    I included multiple sizes for different devices. -->
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
     <link rel="manifest" href="favicon/site.webmanifest">
     <link rel="shortcut icon" href="favicon/favicon.ico">
+
+    <!-- [Beginner] - LINKING STYLESHEET
+    This line connects my HTML file to my CSS file (`style.css`), which contains all the styling rules
+    for how the page should look (colors, layout, fonts, etc.). -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- [Intermediate] - ANTI-FLICKER SCRIPT
+    This small script runs before the rest of the page loads. Its purpose is to check for the user's
+    dark mode preference in localStorage. If it finds that dark mode was enabled, it applies the
+    `dark-mode` class to the HTML element immediately. This prevents the page from briefly flashing
+    in light mode before the main script loads and applies the theme. -->
     <script>
-        // Anti-Flicker Script: Apply dark mode immediately if set in localStorage
         (function() {
             try {
                 if (localStorage.getItem('theme') === 'dark') {
@@ -20,8 +38,23 @@
             } catch (e) { console.error("Could not apply initial theme.", e); }
         })();
     </script>
-</head><body>
+    
+    <!-- [Beginner] - LINKING JAVASCRIPT
+    This line connects my HTML to the main JavaScript file (`script.js`), which handles all the game logic,
+    interactivity, and dynamic content updates. I've placed it in the <head> which is a common practice,
+    and I made sure the script waits for the page to load before running to prevent errors. -->
+    <script src="script.js"></script>
+</head>
+<body>
+    <!-- [Advanced/Reflection] - HTML STRUCTURE
+    I structured the entire application within a single `game-container` div. This acts as the main wrapper.
+    For the layout, I primarily used `<div>` elements with specific classes and IDs. While modern HTML has semantic tags
+    like `<main>` or `<aside>`, using divs is a straightforward and flexible approach for building component-like structures.
+    The classes and IDs are then targeted by my CSS for styling and my JavaScript for functionality. -->
     <div class="game-container" id="gameContainer">
+        <!-- [Beginner] - HEADER SECTION
+        This header contains the branding, the main profile information, and the global stats display.
+        It's structured to look like a social media profile page, which fits the game's context. -->
         <header class="game-header">
             <div class="header-main-content">
                 <div class="site-branding">
@@ -40,11 +73,18 @@
                 </div>
             </div>
             <div class="header-controls">
+                <!-- [Intermediate] - DARK MODE TOGGLE (SVG ICONS)
+                This button contains two SVG (Scalable Vector Graphics) icons for the sun and moon.
+                SVGs are great because they are lightweight and scale perfectly without losing quality.
+                The JavaScript toggles their visibility based on the current theme. -->
                 <button id="darkModeToggle" title="Toggle Dark Mode">
                     <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dark-mode-icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                     <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dark-mode-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
             </div>
+            <!-- [Beginner] - GLOBAL STATS
+            This section displays the main scores and statuses. Each `<span>` has a unique ID so that the
+            JavaScript `updateAllDisplays` function can easily find it and update its text content. -->
             <div class="global-stats">
                 <p>Engagement Points: <span id="engagementPointsDisplay">0</span></p>
                 <p>Nathan's Tweets: <span id="totalTweetsDisplay">0</span></p>
@@ -55,21 +95,35 @@
             </div>
         </header>
 
-        <main class="main-layout">
+        <!-- [Intermediate] - MAIN LAYOUT
+        This is the main content area, divided into a two-column layout using Flexbox in the CSS.
+        The `main-layout` div acts as the flex container. -->
+        <div class="main-layout">
+            <!-- [Intermediate] - MOBILE NAVIGATION
+            This header with two buttons only appears on mobile screens. It allows the user to switch
+            between the "Timeline" and "Upgrades" views by clicking the tabs. The JavaScript handles
+            the logic for swapping the visible content. -->
             <div class="main-content-header">
                 <button id="main-view-tab-timeline" class="main-view-tab active">Timeline</button>
                 <button id="main-view-tab-upgrades" class="main-view-tab">Upgrades</button>
             </div>
 
-            <section id="tweetFeedContainer" class="feed-column">
+            <!-- [Beginner] - TIMELINE/FEED COLUMN
+            This div holds the tweet feed. Tweets are dynamically added here by the JavaScript. -->
+            <div id="tweetFeedContainer" class="feed-column">
                 <h3 class="desktop-only-header">Timeline</h3>
                 <div id="tweetFeed">
                     <p class="no-tweets-message">Nathan is preparing his first tweet...</p>
                 </div>
-            </section>
+            </div>
 
-            <aside class="sidebar-column">
-                <section id="upgradesArea">
+            <!-- [Beginner] - SIDEBAR COLUMN
+            This div is the sidebar, which contains the Upgrades and Notifications sections. -->
+            <div class="sidebar-column">
+                <!-- [Beginner] - UPGRADES SECTION
+                This holds the list of all possible upgrades. The `<li>` elements are initially hidden
+                and are made visible by the JavaScript as the player progresses through the game. -->
+                <div id="upgradesArea">
                     <h4>Upgrades</h4>
                     <ul id="upgradesList">
                         <!-- Interaction Unlocks -->
@@ -83,7 +137,10 @@
                         <li id="upgrade-bookmarkbot-unlock" style="display: none;"><button id="upgrade-bookmarkbot-unlock-button"></button></li>
                         <li id="upgrade-sponsorbot-unlock" style="display: none;"><button id="upgrade-sponsorbot-unlock-button"></button></li>
                         
-                        <!-- Bot Toggles (with progress bars) -->
+                        <!-- [Intermediate] - BOT TOGGLES WITH PROGRESS BARS
+                        This structure pairs a toggle button with a progress bar for each bot.
+                        The progress bar is just two nested divs. The JavaScript updates the `width` style
+                        of the inner div to create the filling effect, providing clear visual feedback on the bot's timer. -->
                         <li id="upgrade-likebot-toggle" style="display: none;">
                             <button id="upgrade-likebot-toggle-button"></button>
                             <div class="bot-progress-container"><div id="likeBotProgressBar" class="bot-progress-bar"></div></div>
@@ -101,29 +158,33 @@
                             <div class="bot-progress-container"><div id="sponsorBotProgressBar" class="bot-progress-bar"></div></div>
                         </li>
                     </ul>
-                </section>
-                <section id="activityNotificationsArea">
+                </div>
+                <!-- [Beginner] - NOTIFICATIONS SECTION
+                This list is where notifications about game events are dynamically added by the JavaScript. -->
+                <div id="activityNotificationsArea">
                     <h4>Notifications</h4>
                     <ul id="notificationsList">
                         <!-- Notifications will appear here -->
                     </ul>
-                </section>
-            </aside>
-        </main>
+                </div>
+            </div>
+        </div>
 
-        <footer class="game-footer">
+        <div class="game-footer">
             <p>© Elon Musk</p>
-        </footer>
+        </div>
     </div>
     
+    <!-- [Beginner] - END SCREEN
+    This screen is hidden by default and is only shown when the player "wins" by blocking Nathan. -->
     <div id="endScreen" style="display: none;">
         <h1>Nathan is alone.</h1>
         <p class="final-stat">You blocked him in: <span id="finalTimeDisplay">00:00:00</span></p>
         <button id="resetGameButton">Play Again?</button>
     </div>
 
-    <script src="script.js"></script>
-
+    <!-- [Beginner] - WELCOME MODAL
+    This is the welcome pop-up for first-time players. It's also hidden by default and shown by JavaScript. -->
     <div id="welcomeModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <h2>Welcome to Twitter 2!</h2>
