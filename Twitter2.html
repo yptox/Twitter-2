@@ -1,0 +1,176 @@
+<!--// PROJECT OVERVIEW AND CONTEXT
+
+ Twitter 2 is an incremental game that satirizes the repetitive and addictive nature of social media, and the meaninglessness of the content and interactions. On Twitter 2, the only user is Nathan. 
+ The tone is meant to be absurd and humorous, and the aim is to get the player engaged in the gameplay loop.
+
+ The main action for the game is the "Click." The whole game is built around clicking to get "Engagement Points" (EP). You use these points to buy upgrades that click for you or make your clicks better. This is a simple incremental gameplay loop where things start slow and then build quickly.
+
+ The visual design of the site is essentially as close to that of Twitter's as I could get. It uses the same logo, font, feed, colour scheme, light/dark modes, etc.
+-->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter 2</title>
+
+    <!-- included the twitter logo as a favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="shortcut icon" href="favicon/favicon.ico">
+
+
+    <link rel="stylesheet" href="style.css">
+
+    <!--  I had an issue where the page would flash with a white background if the player refreshed the page after selecting the dark mode. this short script solves that problem
+ -->
+    <script>
+        (function() {
+            try {
+                if (localStorage.getItem('theme') === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                }
+            } catch (e) { console.error("Could not apply initial theme.", e); }
+        })();
+    </script>
+    
+
+    <script src="script.js"></script>
+</head>
+<body>
+ 
+    <div class="game-container" id="gameContainer">
+        <!-- The header is the site logo, Nathan's profile info, and the main game stats -->
+        <header class="game-header">
+            <div class="header-main-content">
+                <div class="site-branding">
+                    <img src="images/Twitter.png" alt="Twitter Logo" class="site-logo">
+                </div>
+                <div class="profile-header">
+                    <img src="images/NathanImage7.png" alt="Nathan Henry" id="profilePicMain">
+                    <div class="profile-info">
+                        <div class="profile-name-container">
+                            <h1>Nathan Henry</h1>
+                            <button id="blockNathanButton" style="display: none;">Block (10,000 EP)</button>
+                        </div>
+                        <p class="handle">@Nathan9154438</p>
+                        <p class="bio" id="nathanBio">love to post</p>
+                    </div>
+                </div>
+            </div>
+            <div class="header-controls">
+                <!-- This is the dark mode toggle button, I used SVGs from w3 for the sun and moon. -->
+                <button id="darkModeToggle" title="Toggle Dark Mode">
+                    <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dark-mode-icon"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dark-mode-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+            </div>
+            <!-- This part shows the main scores for the game. each "<span>"" has a unique ID so my
+            "updateAllDisplays" function in JavaScript can change the numbers-->
+            <div class="global-stats">
+                <p>Engagement Points: <span id="engagementPointsDisplay">0</span></p>
+                <p>Nathan's Tweets: <span id="totalTweetsDisplay">0</span></p>
+                <p id="likeBotStatusDisplay" style="display: none;">LikeBot: Inactive</p>
+                <p id="repostBotStatusDisplay" style="display: none;">RepostBot: Inactive</p>
+                <p id="bookmarkBotStatusDisplay" style="display: none;">BookmarkBot: Inactive</p>
+                <p id="sponsorBotStatusDisplay" style="display: none;">SponsorBot: Inactive</p>
+            </div>
+        </header>
+
+        <!-- This is the main content area, which I split into two columns using Flexbox in the CSS.
+        The "main-layout" div holds both columns -->
+        <div class="main-layout">
+            <!-- This header only shows up on small screens (intended for mobile). It has two buttons that let the user
+            switch between the "Timeline" and "Upgrades" views. My JavaScript handles showing and hiding the content when you click these tabs.
+            this was the best solution to have the sites layout work on mobile. -->
+            <div class="main-content-header">
+                <button id="main-view-tab-timeline" class="main-view-tab active">Timeline</button>
+                <button id="main-view-tab-upgrades" class="main-view-tab">Upgrades</button>
+            </div>
+
+            <!-- main feed -->
+            <div id="tweetFeedContainer" class="feed-column">
+                <h3 class="desktop-only-header">Timeline</h3>
+                <div id="tweetFeed">
+                    <p class="no-tweets-message">Nathan is preparing his first tweet...</p>
+                </div>
+            </div>
+
+            <!-- sidebar for Notifications and Upgrades -->
+            <div class="sidebar-column">
+                <!-- This section holds the list of all the upgrades you can buy. Each list itemis hidden
+                at first, and my script makes them appear one by one as the player makes progress. -->
+                <div id="upgradesArea">
+                    <h4>Upgrades</h4>
+                    <ul id="upgradesList">
+                        <!-- Interaction Unlocks -->
+                        <li id="upgrade-repost" style="display: none;"><button id="upgrade-repost-button"></button></li>
+                        <li id="upgrade-bookmark" style="display: none;"><button id="upgrade-bookmark-button"></button></li>
+                        <li id="upgrade-sponsor" style="display: none;"><button id="upgrade-sponsor-button"></button></li>
+
+                        <!-- Bot Unlocks -->
+                        <li id="upgrade-likebot-unlock" style="display: none;"><button id="upgrade-likebot-unlock-button"></button></li>
+                        <li id="upgrade-repostbot-unlock" style="display: none;"><button id="upgrade-repostbot-unlock-button"></button></li>
+                        <li id="upgrade-bookmarkbot-unlock" style="display: none;"><button id="upgrade-bookmarkbot-unlock-button"></button></li>
+                        <li id="upgrade-sponsorbot-unlock" style="display: none;"><button id="upgrade-sponsorbot-unlock-button"></button></li>
+                        
+                        <!-- This structure is for the bot controls. It has a button to turn the bot on and off, and a progress bar -->
+                        <li id="upgrade-likebot-toggle" style="display: none;">
+                            <button id="upgrade-likebot-toggle-button"></button>
+                            <div class="bot-progress-container"><div id="likeBotProgressBar" class="bot-progress-bar"></div></div>
+                        </li>
+                        <li id="upgrade-repostbot-toggle" style="display: none;">
+                            <button id="upgrade-repostbot-toggle-button"></button>
+                            <div class="bot-progress-container"><div id="repostBotProgressBar" class="bot-progress-bar"></div></div>
+                        </li>
+                        <li id="upgrade-bookmarkbot-toggle" style="display: none;">
+                            <button id="upgrade-bookmarkbot-toggle-button"></button>
+                            <div class="bot-progress-container"><div id="bookmarkBotProgressBar" class="bot-progress-bar"></div></div>
+                        </li>
+                        <li id="upgrade-sponsorbot-toggle" style="display: none;">
+                            <button id="upgrade-sponsorbot-toggle-button"></button>
+                            <div class="bot-progress-container"><div id="sponsorBotProgressBar" class="bot-progress-bar"></div></div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- This list is where notifications about game events (like unlocking something) are added-->
+                <div id="activityNotificationsArea">
+                    <h4>Notifications</h4>
+                    <ul id="notificationsList">
+                        <!-- Notifications will appear here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-footer">
+            <p>© Elon Musk</p>
+        </div>
+    </div>
+    
+    <!-- This is the end screen. it only shows when the player wins the game by blocking Nathan. -->
+    <div id="endScreen" style="display: none;">
+        <h1>Nathan is alone.</h1>
+        <p class="final-stat">You blocked him in: <span id="finalTimeDisplay">00:00:00</span></p>
+        <button id="resetGameButton">Play Again?</button>
+    </div>
+
+    <!-- This is the welcome message for when you open the site for the first time -->
+    <div id="welcomeModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2>Welcome to Twitter 2!</h2>
+            <p>It's just Nathan here. Every interaction with him will reward you with Engagement Points (EP).</p>
+            <p>Use EP to automate interactions and unlock awesome new ways to engage!</p>
+            <p class="unlock-notification">Nathan loves when you like his tweets! Whenever he recieves a like, he'll post a new one.</p>
+            <button id="welcomeModalCloseButton">Great!</button>
+        </div>
+    </div>
+
+</body>
+</html>

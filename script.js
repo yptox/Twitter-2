@@ -1,33 +1,20 @@
-// [Advanced/Reflection] - PROJECT OVERVIEW AND CONTEXT
-//
-// CONTEXT: [This is where you explain the core idea. For example: This project is an incremental game that parodies the engagement-driven nature of social media platforms like Twitter/X. The context is meant to be slightly absurd and comedic, focusing on a single, lonely user, "Nathan."]
-//
-// CHOSEN ACTION: [Explain your chosen action. For example: The fundamental interaction is the "Click." The entire game is built around clicking to gain "Engagement Points" (EP), which are then used to purchase upgrades that automate or enhance the clicking process. This creates a satisfying gameplay loop.]
-//
-// DESIGN INFLUENCE: [Explain how the context shaped the design. For example: The Twitter context heavily influenced the UI design, including the layout of the feed, the use of terms like "Like" and "Repost," and the inclusion of a dark mode. The core currency, "Engagement Points," is a direct commentary on how social media measures value.]
-//
 
-// --- GAME STATE & CONFIGURATION (as global variables, typical for beginner code) ---
+// --- Game State ---
 
-// [Beginner] - CORE GAME VARIABLES
-// I've used global variables here to hold the main scores and counters for the game.
-// This makes them accessible from any function, which is straightforward for a project of this size.
+// These are the main scores and counters for the game. I made them global variables so that any function in the script can access them easily.
 let engagementPoints = 0;
 let totalTweets = 0;
 let gameStartTime = 0;
 let nathanTweets = [];
 let autoSaveIntervalId = null; 
 
-// [Beginner] - MECHANIC VALUES
-// These variables control the core game balance, like how many points each action gives.
-// Keeping them here at the top makes them easy to find and tweak if I want to change the game's difficulty.
+// These variables control the core game balance, like how many points each action gives. theyre easily editable to change how the game feels.
 let epPerLike = 1;
 let epPerRepost = 3;
 let epPerBookmark = 5;
 let epPerSponsor = 10;
 
-// [Beginner] - UPGRADE FLAGS & COSTS
-// These are 'boolean flags' that track what the player has unlocked. They start as 'false'.
+// These are boolean flags that track what the player has unlocked. They start as false.
 // Each unlockable item also has its cost stored in a variable right next to it.
 let repostUnlocked = false;
 let unlockRepostCost = 50;
@@ -36,57 +23,45 @@ let unlockBookmarkCost = 250;
 let sponsorTweetUnlocked = false;
 let unlockSponsorCost = 1000; 
 
-// [Intermediate] - BOT STATE OBJECTS
-// For the bots, I'm using JavaScript objects to group related variables together.
-// Each bot has properties for whether it's unlocked, active, its cost, its speed (intervalMs), and its current progress.
-// This is more organized than having separate variables for every single property of every bot (e.g., likeBotUnlocked, likeBotActive, etc.).
+// For the bots, I'm using JavaScript objects to group related variables together. Each bot has properties for whether it's unlocked, active, its cost, its speed, and its current progress.
 let likeBot = { unlocked: false, active: false, cost: 25, intervalMs: 3000, intervalId: null, progress: 0 };
 let repostBot = { unlocked: false, active: false, cost: 150, intervalMs: 5000, intervalId: null, progress: 0 };
 let bookmarkBot = { unlocked: false, active: false, cost: 750, intervalMs: 8000, intervalId: null, progress: 0 };
 let sponsorBot = { unlocked: false, active: false, cost: 3000, intervalMs: 12000, intervalId: null, progress: 0 };
     
-// [Beginner] - NATHAN'S AUTO-TWEETING STATE
-// These variables control the game's feature where Nathan starts tweeting on his own later in the game.
+// These variables control the game's feature where Nathan starts tweeting on his own later in the game. This feature exists to make the player feel completely overwhelmed by the amount of garbage being spewed at them.
 let nathanIsTweetingAutomatically = false;
 let nathanTweetIntervalId = null;
 const NATHAN_TWEET_INTERVAL_MS = 7000;
 
-// [Beginner] - GAME CONSTANTS
-// These are values that don't change during the game. Using 'const' ensures they can't be accidentally overwritten.
 const MAX_TWEETS_ON_FEED = 40;
 const NATHAN_IMAGE_COUNT = 37;
 const IMAGE_TWEET_CHANCE = 0.05;
 const BLOCK_NATHAN_COST = 10000;
 
-// --- INITIALIZATION ---
+// --- Game Initialisation ---
 
-// [Beginner] - DOMCONTENTLOADED
-// This is a very important event listener. It makes sure that all the HTML on the page is fully loaded
-// before the JavaScript tries to find and interact with any elements. Without this, I would get errors
-// because the script might run before the buttons and divs it's looking for exist.
+// using domcontentloaded to ensure html is fully loaded before the script runs
 document.addEventListener('DOMContentLoaded', async () => {
-    
-    // [Intermediate] - ASYNCHRONOUS DATA FETCHING
-    // This part of the code loads the tweet text from an external file. I used 'async/await' with the 'fetch' API.
-    // This is an asynchronous operation, meaning it doesn't freeze the page while it's loading the file.
-    // The 'try...catch' block is for error handling. If the 'NathanTweets.txt' file is missing or can't be loaded,
-    // it will log an error to the console and provide some default tweets so the game doesn't crash.
+        
+    // This loads the tweet text from an external file. At first I had all the tweets just inside the js file but it just felt wrong so I learnt how to fetch them from a txt file.
+    // The "try catch" block is for error handling. If the "NathanTweets.txt" file is missing or can't be loaded itll log an error to the console and provide a placeholder tweet.
     try {
         const response = await fetch('NathanTweets.txt');
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`http error: ${response.status}`);
         }
         const text = await response.text();
         nathanTweets = text.split('\n').filter(line => line.trim() !== '');
     } catch (e) {
         console.error("Could not load NathanTweets.txt:", e);
-        nathanTweets = ["Error: Could not load tweets.", "Nathan is at a loss for words."];
+        nathanTweets = ["Could not load tweets"];
     }
     
-    // [Beginner] - EVENT LISTENERS
-    // This is where I connect the HTML buttons to my JavaScript functions.
-    // I get each button by its ID and then use 'addEventListener' to tell it what function to run when it's clicked.
-    // For example, when the button with the ID 'blockNathanButton' is clicked, the 'blockNathan' function is executed.
+    // This is where the buttons in the html connect to the functions in the script.
+    // using "addEventListener" to tell each button what function to run when its clicked.
+
+
     document.getElementById('blockNathanButton').addEventListener('click', blockNathan);
     document.getElementById('resetGameButton').addEventListener('click', resetGame);
     document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
@@ -105,9 +80,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('upgrade-bookmarkbot-toggle-button').addEventListener('click', toggleBookmarkBot);
     document.getElementById('upgrade-sponsorbot-toggle-button').addEventListener('click', toggleSponsorBot);
     
-    // [Intermediate] - MOBILE VIEW LOGIC
-    // This code handles the tab-based navigation on smaller screens.
-    // It adds a class to the main layout container, and the CSS uses that class to show/hide the correct column (Timeline or Upgrades).
+
+    // This code handles the tab navigation on mobile.
+    // It adds a class to the main layout container used by css to show the appropriate column (timeline or upgrades)
     const mainLayout = document.querySelector('.main-layout');
     const tabTimeline = document.getElementById('main-view-tab-timeline');
     const tabUpgrades = document.getElementById('main-view-tab-upgrades');
@@ -127,7 +102,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     tabTimeline.addEventListener('click', () => setMobileView('timeline'));
     tabUpgrades.addEventListener('click', () => setMobileView('upgrades'));
 
-    // [Beginner] - MODAL LOGIC
     // This handles the pop-up welcome message for new players.
     const welcomeModal = document.getElementById('welcomeModal');
     const welcomeModalCloseButton = document.getElementById('welcomeModalCloseButton');
@@ -137,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.setItem('nathansTwitterWelcome_v1', 'true');
     });
 
-    // [Beginner] - GAME START
+
     // These functions run once the page is ready to start the game.
     loadGame();
 
@@ -152,9 +126,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     setMobileView('timeline');
 });
 
-// [Beginner] - DARK MODE TOGGLE
-// This function switches between light and dark mode. It works by adding or removing the 'dark-mode' class
-// from the main `<html>` element. The CSS file has specific rules for when this class is present.
+
+// this is the dark mode toggle code. it adds or removes the "dark-mode" class from the main html element.
 // It also saves the user's preference in localStorage so it's remembered the next time they visit.
 function toggleDarkMode() {
     document.documentElement.classList.toggle('dark-mode');
@@ -164,21 +137,19 @@ function toggleDarkMode() {
     localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
 }
 
-// [Intermediate] - SAVE/LOAD SYSTEM
-// These functions handle saving and loading the player's progress.
-// DESIGN CHOICE: I chose localStorage because it's a simple, browser-based way to store data without needing a server.
-// It stores data as key-value pairs of strings.
+
+// using localStorage to save and load progress. it stores data as key-value pairs of strings.
 function saveGame() {
     try {
-        // I gather all the global game variables into a single 'stateToSave' object.
+        // gather all the global game variables into a single object
         let stateToSave = {
             engagementPoints, totalTweets, gameStartTime,
             repostUnlocked, bookmarkUnlocked, sponsorTweetUnlocked,
             likeBot, repostBot, bookmarkBot, sponsorBot,
             nathanIsTweetingAutomatically
         };
-        // Because localStorage can only store strings, I use JSON.stringify to convert the object into a JSON string.
-        // I also have to handle the interval IDs, which can't be saved. This 'cleanSave' step removes them before saving.
+        // have to use JSON.stringify to convert the object into a JSON string.
+        // this step removes the intervalIds before saving
         let cleanSave = JSON.parse(JSON.stringify(stateToSave));
         cleanSave.likeBot.intervalId = null;
         cleanSave.repostBot.intervalId = null;
@@ -190,13 +161,13 @@ function saveGame() {
 }
 
 function loadGame() {
-    // It checks if a save file exists in localStorage.
+    // check if a save file exists in localStorage
     const saved = localStorage.getItem('nathansTwitter2Save_v1.5');
     if (saved) {
         try {
-            // If a save exists, it uses JSON.parse to turn the saved string back into a JavaScript object.
+            // if a save exists, use JSON.parse to turn the saved string back into a JavaScript object.
             const parsed = JSON.parse(saved);
-            // It then updates all the global variables with the loaded values.
+            // updates all the global variables with the loaded values.
             engagementPoints = parsed.engagementPoints || 0;
             totalTweets = parsed.totalTweets || 0;
             gameStartTime = parsed.gameStartTime || Date.now();
@@ -205,21 +176,22 @@ function loadGame() {
             sponsorTweetUnlocked = parsed.sponsorTweetUnlocked || false;
             nathanIsTweetingAutomatically = parsed.nathanIsTweetingAutomatically || false;
             
-            likeBot = { ...likeBot, ...parsed.likeBot };
-            repostBot = { ...repostBot, ...parsed.repostBot };
-            bookmarkBot = { ...bookmarkBot, ...parsed.bookmarkBot };
-            sponsorBot = { ...sponsorBot, ...parsed.sponsorBot };
+            // loading bots by taking the saved bot info from "parsed" and updating the existing bot objects with it so I don't lose anything that wasn't saved.
+            Object.assign(likeBot, parsed.likeBot);
+            Object.assign(repostBot, parsed.repostBot);
+            Object.assign(bookmarkBot, parsed.bookmarkBot);
+            Object.assign(sponsorBot, parsed.sponsorBot);
 
         } catch(e) {
             console.error("Failed to parse save data, starting new game.", e);
             initializeNewGame();
         }
     } else {
-        // If there's no save file, it calls a function to set up a fresh game.
+        // If there's no save file, it calls a function to start a new game.
         initializeNewGame();
     }
     
-    // After loading, it updates all the visual elements on the page to match the loaded state.
+    // After loading update all the elements on the page to match the loaded state. (light v dark)
     const isDarkMode = localStorage.getItem('theme') === 'dark';
     document.getElementById('sun-icon').style.display = isDarkMode ? 'none' : 'block';
     document.getElementById('moon-icon').style.display = isDarkMode ? 'block' : 'none';
@@ -228,16 +200,14 @@ function loadGame() {
     updateNathanAutoTweetState();
     updateAllDisplays();
 
-    // It also sets up the auto-save timer.
+    // Setting up the auto-save timer.
     window.addEventListener('beforeunload', saveGame);
     if (!autoSaveIntervalId) {
         autoSaveIntervalId = setInterval(saveGame, 15000);
     }
 }
 
-// [Beginner] - NEW GAME INITIALIZER
-// This function just resets all the game variables to their starting values.
-// It's called when a player starts for the first time or if their save data is corrupted.
+// This function sets all the game variables to their starting values. It's called when a player starts for the first time.
 function initializeNewGame() {
     engagementPoints = 0;
     totalTweets = 0;
@@ -252,11 +222,8 @@ function initializeNewGame() {
     sponsorBot = { unlocked: false, active: false, cost: 3000, intervalMs: 12000, intervalId: null, progress: 0 };
 }
 
-// [Intermediate] - AFFECTIVE FEEDBACK
 // This function creates the floating "+1 EP" text that appears when you click.
-// DESIGN CHOICE: This is a key piece of user feedback. It makes the 'Click' action feel satisfying and rewarding.
-// It works by creating a new `<div>` element, positioning it where the click happened, and then using a CSS animation
-// to make it float up and fade out. This immediate visual reward is a core principle of engaging game design.
+// It works by creating a new div element, positioning it where the click happened, and then using a CSS animation to make it float up and fade out.
 function createClickPopup(text, options) {
     const popup = document.createElement('div');
     popup.innerHTML = text; popup.className = 'click-popup';
@@ -267,9 +234,7 @@ function createClickPopup(text, options) {
     setTimeout(() => popup.remove(), 1100);
 }
 
-// [Beginner] - HANDLING INTERACTIONS
-// This function is called whenever a player clicks an interaction button (Like, Repost, etc.).
-// It determines which button was clicked, adds the correct number of points, disables the button, and updates the display.
+// This function is called whenever a player clicks a post interaction button. It determines which button was clicked, adds the set number of points, disables the button, and updates the display
 function handleInteraction(buttonElement, interactionType) {
     let epGained = 0;
     let completedText = '';
@@ -294,7 +259,8 @@ function handleInteraction(buttonElement, interactionType) {
     buttonElement.disabled = true;
     createClickPopup(`+${epGained} EP`, { target: buttonElement });
 
-    // The 'Like' action is special because it's the primary way the player manually generates new content.
+    // The "Like" action is different because it's the main way the player manually generates new content. I tested the game with and without this, but i think it makes the game feel better. The user has a direct impact on the feed.
+    // At first I had it so the LikeBot wouldn't cause a tweet to be generated but after testing it actually felt more engaging so I included it.
     if (interactionType === 'Like') {
         addNotification("Your Like prompted Nathan to tweet!", "system");
         createAndAppendTweet();
@@ -302,12 +268,8 @@ function handleInteraction(buttonElement, interactionType) {
     updateAllDisplays();
 }
 
-// [Intermediate] - DYNAMIC CONTENT CREATION (DOM MANIPULATION)
-// This function builds a new tweet HTML structure entirely within JavaScript.
-// It uses `document.createElement` to create each `<div>`, `<p>`, `<img>`, etc., sets their classes and content,
-// and then uses `appendChild` to piece them together like building blocks.
-// DESIGN CHOICE: This is necessary because the tweets are generated dynamically during gameplay. Instead of having static HTML,
-// this function allows for an infinite feed of content. It also removes old tweets to keep the page from getting too slow.
+// This function builds a new tweet HTML structure entirely within JavaScript. It uses "document.createElement" to create each div, p, img, etc., sets their classes and content, and then uses "appendChild" to put them together.
+// At a certain point this also removes old tweets to keep the page from getting too slow.
 function createAndAppendTweet() {
     const tweetFeed = document.getElementById('tweetFeed');
     const noTweetsMessage = tweetFeed.querySelector('.no-tweets-message');
@@ -428,10 +390,9 @@ function generateNathanTweetData() {
     return { text, image };
 }
 
-// [Beginner] - UPGRADE PURCHASE FUNCTIONS
-// I created a separate function for each unlock. This approach is very direct.
-// Each function checks if the player has enough points, and if so, it subtracts the cost and sets the unlock flag to true.
-// This is an example of "WET" (Write Everything Twice) code, but it's simple to understand for each specific case.
+
+// Each "feature" unlock has a seperate function that checks if the player has enough points and if they do removes the the cost from their EP and sets the unlock flag to true.
+
 function purchaseRepostUnlock() {
     if (engagementPoints >= unlockRepostCost) {
         engagementPoints -= unlockRepostCost;
@@ -495,11 +456,8 @@ function purchaseSponsorBotUnlock() {
     }
 }
 
-// [Intermediate] - AUTOMATION LOGIC (BOTS)
-// This function uses `setInterval` to create the game's automation. `setInterval` is a JavaScript function
-// that repeatedly calls a function after a specified delay.
-// Here, it's used to increment a bot's progress bar. When the progress reaches 100%, it executes the bot's action
-// (like clicking a button for the player) and resets the progress. This is the core of the "idle" or "incremental" game genre.
+// This function uses "setInterval" to create the game's automation. When the progress reaches 100%, it clicks the bot's set button and resets the progress of the loading bar.
+// This automation is the basis of the incremental/idle game genre. The bots run at different speeds for game balance.
 function startBot(botName) {
     let botState;
     if (botName === 'likeBot') botState = likeBot;
@@ -539,7 +497,7 @@ function startBot(botName) {
 function executeBotAction(botName) {
     const interactionType = botName.replace('Bot', '');
     const buttonSelector = `.${interactionType}-button`;
-    // The bot needs to find a button on the page that it can actually click.
+    // The bot needs to find a button on the page that it can click.
     const button = document.getElementById('tweetFeed').querySelector(`.tweet ${buttonSelector}:not(:disabled)`);
 
     if (button) {
@@ -568,9 +526,7 @@ function executeBotAction(botName) {
     }
 }
 
-// [Beginner] - BOT TOGGLE FUNCTIONS
-// More duplicated functions, one for each bot toggle button.
-// They simply flip the 'active' boolean on the bot's state object and update the UI.
+// functions for the bot toggle buttons
 function toggleLikeBot() {
     likeBot.active = !likeBot.active;
     if (likeBot.active) {
@@ -635,16 +591,12 @@ function restartAllBotIntervals() {
     }
 }
 
-// [Intermediate] - UI UPDATE FUNCTIONS
-// This is the "render" part of the game. These functions are responsible for making sure the visual
-// elements on the page match the current state of the game stored in the JavaScript variables.
-// They are called after any action that changes the game state (e.g., gaining points, buying an upgrade).
+// These functions ensure the visual display of the site lines up with the game state.
 function updateAllDisplays() {
-    // This uses `document.getElementById` to find elements and update their text content.
+
     document.getElementById('engagementPointsDisplay').textContent = formatNumber(engagementPoints);
     document.getElementById('totalTweetsDisplay').textContent = formatNumber(totalTweets);
     
-    // This section updates the status text for each bot in the header.
     document.getElementById('likeBotStatusDisplay').style.display = likeBot.unlocked ? 'inline' : 'none';
     if(likeBot.unlocked) document.getElementById('likeBotStatusDisplay').textContent = `LikeBot: ${likeBot.active ? 'Active' : 'Paused'}`;
     
@@ -671,9 +623,7 @@ function updateAllDisplays() {
 function updateUpgradesDisplay() {
     const ep = engagementPoints;
 
-    // This section handles the logic for the upgrades list. It shows or hides upgrades based on what
-    // the player has already unlocked. It also enables or disables the purchase buttons based on
-    // whether the player can afford the upgrade. This creates a sense of progression for the user.
+    // this is the feature unlock list function, it shows or hides upgrades based on what the player has already unlocked. It also enables or disables the purchase buttons based on if the player can afford the upgrade.
     document.getElementById('upgrade-repost').style.display = !repostUnlocked ? 'block' : 'none';
     if (!repostUnlocked) {
         document.getElementById('upgrade-repost-button').textContent = `Unlock Reposts (${formatNumber(unlockRepostCost)} EP)`;
@@ -785,27 +735,33 @@ function blockNathan() {
 }
 
 function resetGame() {
-    // Clear any timers and remove event listeners to prevent memory leaks
+    // Clear any timers and remove event listeners s
     if (autoSaveIntervalId) {
         clearInterval(autoSaveIntervalId);
         autoSaveIntervalId = null;
     }
     window.removeEventListener('beforeunload', saveGame);
 
-    // Clear the data from localStorage
+    // Clear localStorage
     localStorage.removeItem('nathansTwitter2Save_v1.5');
     localStorage.removeItem('theme');
 
-    // Reload the page to start fresh
     window.location.reload();
 }
 
 
-// [Advanced/Reflection] - CHALLENGES & FUTURE IMPROVEMENTS
+// Reflection
 //
-// CHALLENGES: [Describe a challenge you faced. For example: A key challenge was managing all the different timers (setIntervals) for the bots and the auto-save. When loading a game or ending it, I had to be careful to clear all existing intervals to prevent them from running in the background and causing bugs or performance issues. Another challenge was structuring the save/load system to correctly handle all the separate global variables.]
+// I had a pretty solid idea of what I wanted to create for this project. Once I had the idea of combining a social media satire with an incremental game, I figured I'd be pretty set to get it going. I have experience creating incremental game-like projects before,
+// so I had a good understanding of what the logic would look like. I just had to figure out how to get this logic into javascript. Honestly, there are so many resources available that I think given enough time anyone could probably remake any site if they wanted to.
+// I used Google's recent Gemini model to brainstorm how to structure the code and how to fix certain bugs that were bothering me (The flashing white screen when refreshing in dark mode made me so annoyed) but I wanted to make sure I was writing all the code myself.
+//  I had difficulty managing all the different timers (setIntervals) for the bots and the auto-save. When loading a game or ending it, I had to be careful to clear all the  intervals to prevent them from running in the background and causing bugs or performance issues.
+// Figuring out the right way to set up the CSS for mobile use was tricky too, but I was pleased with the multiple tabs solution. The site definitely could run cleaner, but it's pretty much fully functional on desktop and mobile, so I'm happy with it. 
+// 
+// Writing out all of the tweets was a lot of fun. I just had a list that I'd come back to every once in a while. I had periods where I'd just scroll through instagram and write down whatever I felt the platform was making me feeling, or try remake someone's post from 
+// Nathan's point of view. He's an interesting guy. I definitely wouldn't follow him if I had the choice. If I expanded this prototype into a fully featured game I'd add different upgrade tiers of interactions, i.e. upgrading the Like to give more EP or make the 
+// RepostBot twice as fast or something like that. I'd also like to add more interactivity based on the specific interactions you have with Nathan, and the content he posts that you choose to like. I'd also like to add a comment/messaging with Nathan 
+// feature, but that's beyond the scope of this project.
 //
-// FUTURE IMPROVEMENTS: [Describe how this could be expanded. For example: This prototype could be expanded into a more complex game. I could add more upgrade tiers, or different types of "posts" that give different rewards. The JavaScript structure, while simple, is modular enough that adding a new 'CommentBot' would be straightforward by copying the pattern of the existing bots. The main limitation is that the extensive use of global variables would become hard to manage in a much larger project, and I would likely move to a more structured state management pattern if I were to continue development.]
-//
-// MEDIA ATTRIBUTION: [List where your non-code assets came from. For example: The Twitter logo is used for the purpose of parody. The avatar images and tweet content were generated/created by [Your Name/Source]. All other code was written by me.]
+// The Twitter logo is used for parody purposes. All other images were generated by me using ChatGPT. All tweets were written by me.
 //
